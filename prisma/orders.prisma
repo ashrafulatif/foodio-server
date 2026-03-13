@@ -1,0 +1,15 @@
+model Order {
+  id            String        @id @default(uuid(7))
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        OrderStatus   @default(PENDING)
+  total         Float
+  paymentMethod PaymentMethod
+  address       String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  items         OrderItem[]
+  @@index([userId])
+  @@map("orders")
+}

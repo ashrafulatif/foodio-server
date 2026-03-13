@@ -1,0 +1,17 @@
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING      
+  PREPARING    
+  READY       
+  COMPLETED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  ONLINE
+}
