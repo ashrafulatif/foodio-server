@@ -9,6 +9,7 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -44,8 +45,8 @@ export class OrdersController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  async findAllOrder() {
-    const result = await this.ordersService.findAllOrder();
+  async findAllOrder(@Query() query: any) {
+    const result = await this.ordersService.findAllOrder(query);
     return sendResponse({
       statusCode: status.OK,
       success: true,

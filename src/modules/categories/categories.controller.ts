@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 import { CategoriesService } from './categories.service';
@@ -40,8 +41,8 @@ export class CategoriesController {
   }
 
   @Get()
-  async findAllCategories() {
-    const result = await this.categoriesService.findAllCategories();
+  async findAllCategories(@Query() query: string) {
+    const result = await this.categoriesService.findAllCategories(query);
 
     return sendResponse({
       statusCode: status.OK,

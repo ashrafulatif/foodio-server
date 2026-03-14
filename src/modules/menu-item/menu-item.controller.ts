@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { MenuItemService } from './menu-item.service';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
@@ -36,13 +37,14 @@ export class MenuItemController {
   }
 
   @Get()
-  async findAllMenuItems() {
-    const result = await this.menuItemService.findAllMenuItems();
+  async findAllMenuItems(@Query() query: string) {
+    const result = await this.menuItemService.findAllMenuItems(query);
     return sendResponse({
       statusCode: status.OK,
       success: true,
       message: 'Menu items retrieved successfully',
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   }
 

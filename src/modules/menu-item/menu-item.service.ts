@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ConflictException,
   Injectable,
@@ -6,6 +7,7 @@ import {
 import { Prisma } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
+import paginationAndSortHelper from 'src/common/utils/paginationAndSorting';
 import { UpdateMenuItemDto } from './dto/update-menu-item.dto';
 
 @Injectable()
@@ -45,11 +47,75 @@ export class MenuItemService {
     }
   }
 
-  async findAllMenuItems() {
-    return this.prisma.menuItem.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: { category: true },
+  async findAllMenuItems(query: any) {
+    const { search, categoryId, available } = query;
+
+    const { page, limit, skip, sortBy, sortOrder } =
+      paginationAndSortHelper(query);
+
+    const andConditions: any[] = [];
+
+    // search
+    if (search) {
+      andConditions.push({
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      });
+    }
+
+    // filter by category
+    if (categoryId) {
+      andConditions.push({
+        categoryId,
+      });
+    }
+
+    // filter by availability
+    if (available !== undefined) {
+      andConditions.push({
+        available: available === 'true',
+      });
+    }
+
+    const whereCondition = andConditions.length ? { AND: andConditions } : {};
+
+    const result = await this.prisma.menuItem.findMany({
+      where: whereCondition,
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+      include: {
+        category: true,
+      },
     });
+
+    const total = await this.prisma.menuItem.count({
+      where: whereCondition,
+    });
+
+    return {
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+      data: result,
+    };
   }
 
   async findMenuItemById(id: string) {

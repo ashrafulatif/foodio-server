@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BadRequestException,
   Injectable,
@@ -8,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus } from 'generated/prisma/enums';
+import paginationAndSortHelper from 'src/common/utils/paginationAndSorting';
 
 @Injectable()
 export class OrdersService {
@@ -81,12 +83,21 @@ export class OrdersService {
     return fullOrder;
   }
 
-  async findAllOrder() {
-    return this.prisma.order.findMany({
+  async findAllOrder(query: any) {
+    const { page, limit, skip } = paginationAndSortHelper(query);
+
+    const orders = await this.prisma.order.findMany({
+      skip,
+      take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
         user: {
-          select: { id: true, name: true, email: true, role: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
         },
         items: {
           include: {
@@ -95,6 +106,18 @@ export class OrdersService {
         },
       },
     });
+
+    const total = await this.prisma.order.count();
+
+    return {
+      meta: {
+        page,
+        limit,
+        total,
+        totalPage: Math.ceil(total / limit),
+      },
+      data: orders,
+    };
   }
 
   async findAllCustomerOrder(userId: string) {

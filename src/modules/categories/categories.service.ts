@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ConflictException,
   Injectable,
@@ -8,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Prisma } from 'generated/prisma/client';
+import paginationAndSortHelper from 'src/common/utils/paginationAndSorting';
 
 @Injectable()
 export class CategoriesService {
@@ -34,10 +36,26 @@ export class CategoriesService {
     }
   }
 
-  async findAllCategories() {
-    return this.prisma.category.findMany({
+  async findAllCategories(query: any) {
+    const { page, limit, skip } = paginationAndSortHelper(query);
+
+    const result = await this.prisma.category.findMany({
+      skip,
+      take: limit,
       orderBy: { createdAt: 'desc' },
     });
+
+    const total = await this.prisma.category.count();
+
+    return {
+      meta: {
+        page,
+        limit,
+        total,
+        totalPage: Math.ceil(total / limit),
+      },
+      data: result,
+    };
   }
 
   async findOne(id: string) {
