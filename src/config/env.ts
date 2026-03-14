@@ -9,7 +9,7 @@ interface EnvConfig {
   PORT: string;
   DATABASE_URL: string;
 
-  ACCESS_TOKEN_SECRET: string;
+  JWT_SECRET: string;
   ACCESS_TOKEN_EXPIRES_IN: string;
 
   FRONTEND_URL: string;
@@ -26,7 +26,7 @@ const loadEnvVariables = (): EnvConfig => {
     'NODE_ENV',
     'PORT',
     'DATABASE_URL',
-    'ACCESS_TOKEN_SECRET',
+    'JWT_SECRET',
     'ACCESS_TOKEN_EXPIRES_IN',
     'FRONTEND_URL',
     'CLOUDINARY_CLOUD_NAME',
@@ -47,7 +47,7 @@ const loadEnvVariables = (): EnvConfig => {
     PORT: process.env.PORT as string,
     DATABASE_URL: process.env.DATABASE_URL as string,
 
-    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET as string,
+    JWT_SECRET: process.env.JWT_SECRET as string,
 
     ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
 
