@@ -1,28 +1,56 @@
 # Foodio Server
 
-Welcome to the Foodio Server! This is the backend service for the Foodio application, built with NestJS. This README will guide you through the setup, usage, and available API routes.
+Welcome to Foodio Server, your ultimate backend solution for food delivery services. This server is built with Node.js and provides a robust API for managing orders, menu items, and user authentication.
 
-## API Base URL
+## Table of Contents
 
-The base URL for the API is `/api/v1`.
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. [API Routes & Role Access](#api-routes--role-access)
+4. [Contributing](#contributing)
+5. [License](#license)
+
+## Installation
+
+To install the Foodio Server, follow these steps:
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/ashrafulatif/foodio-server.git
+   ```
+2. Navigate to the project directory:
+   ```
+   cd foodio-server
+   ```
+3. Install the dependencies:
+   ```
+   npm install
+   ```
+
+## Usage
+
+To start the server, run the following command:
+```bash
+npm start
+```
 
 ## API Routes & Role Access
 
-| Route                          | Method | Access Level              |
-|--------------------------------|--------|---------------------------|
-| `/api/v1/auth/login`          | POST   | Public                    |
-| `/api/v1/auth/register`       | POST   | Public                    |
-| `/api/v1/categories`          | GET    | Admin, User               |
-| `/api/v1/categories/:id`      | GET    | Admin, User               |
-| `/api/v1/menu-items`          | GET    | Admin, User               |
-| `/api/v1/menu-items`          | POST   | Admin                     |
-| `/api/v1/menu-items/:id`      | GET    | Admin, User               |
-| `/api/v1/menu-items/:id`      | PUT    | Admin                     |
-| `/api/v1/menu-items/:id`      | DELETE | Admin                     |
-| `/api/v1/orders`              | GET    | Admin, User               |
-| `/api/v1/orders`              | POST   | User                      |
-| `/api/v1/orders/:id`          | GET    | Admin, User               |
-| `/api/v1/orders/:id`          | PUT    | User                      |
-| `/api/v1/orders/:id`          | DELETE | Admin                     |
+| Route                       | Method | Role Required   |
+|-----------------------------|--------|------------------|
+| /api/v1/auth/login          | POST   | None             |
+| /api/v1/auth/register       | POST   | None             |
+| /api/v1/categories          | GET    | Admin/User       |
+| /api/v1/categories          | POST   | Admin            |
+| /api/v1/menu-items         | GET    | Admin/User       |
+| /api/v1/menu-items         | POST   | Admin            |
+| /api/v1/orders             | GET    | Admin/User       |
+| /api/v1/orders             | POST   | User             |
 
-Make sure to replace the placeholder data here with appropriate data specific to your application's requirements.
+## Contributing
+
+We welcome contributions! Please open issues to discuss any changes or enhancements.
+
+## License
+
+This project is licensed under the MIT License.
