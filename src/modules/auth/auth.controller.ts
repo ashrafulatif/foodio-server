@@ -28,6 +28,9 @@ export class AuthController {
     //set accesstoken in cookie
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
       maxAge: 60 * 60 * 24 * 1000, //1 day
     });
 

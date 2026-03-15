@@ -51,7 +51,8 @@ export class OrdersController {
       statusCode: status.OK,
       success: true,
       message: 'Orders retrieved successfully',
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   }
 
@@ -72,7 +73,7 @@ export class OrdersController {
 
   @Get(':id')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.CUSTOMER)
+  @Roles(UserRole.ADMIN)
   async findOrderById(@Param('id') id: string) {
     const result = await this.ordersService.findOrderById(id);
     return sendResponse({
@@ -85,7 +86,7 @@ export class OrdersController {
 
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  @Patch(':id')
+  @Patch('status/:id')
   async updateOrderStatus(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,

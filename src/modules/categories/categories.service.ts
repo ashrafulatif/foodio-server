@@ -8,7 +8,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Prisma } from 'generated/prisma/client';
 import paginationAndSortHelper from 'src/common/utils/paginationAndSorting';
 
 @Injectable()
@@ -16,24 +15,20 @@ export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createCategory(createCategoryDto: CreateCategoryDto) {
-    try {
-      const existingCategory = await this.prisma.category.findUnique({
-        where: { name: createCategoryDto.name.trim() },
-      });
+    const existingCategory = await this.prisma.category.findUnique({
+      where: { name: createCategoryDto.name.trim() },
+    });
 
-      if (existingCategory) {
-        throw new ConflictException('Category name already exists');
-      }
-
-      const result = await this.prisma.category.create({
-        data: {
-          name: createCategoryDto.name.trim(),
-        },
-      });
-      return result;
-    } catch (error) {
-      this.handlePrismaError(error);
+    if (existingCategory) {
+      throw new ConflictException('Category name already exists');
     }
+
+    const result = await this.prisma.category.create({
+      data: {
+        name: createCategoryDto.name.trim(),
+      },
+    });
+    return result;
   }
 
   async findAllCategories(query: any) {
@@ -52,7 +47,7 @@ export class CategoriesService {
         page,
         limit,
         total,
-        totalPage: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limit),
       },
       data: result,
     };
@@ -71,49 +66,27 @@ export class CategoriesService {
   }
 
   async updateCategory(id: string, updateCategoryDto: UpdateCategoryDto) {
-    try {
-      const existingCategory = await this.prisma.category.findUnique({
-        where: { id },
-      });
+    const existingCategory = await this.prisma.category.findUnique({
+      where: { id },
+    });
 
-      if (!existingCategory) {
-        throw new NotFoundException('Category not found');
-      }
-
-      return await this.prisma.category.update({
-        where: { id },
-        data: {
-          ...(updateCategoryDto.name !== undefined && {
-            name: updateCategoryDto.name.trim(),
-          }),
-        },
-      });
-    } catch (error) {
-      this.handlePrismaError(error);
+    if (!existingCategory) {
+      throw new NotFoundException('Category not found');
     }
+
+    return await this.prisma.category.update({
+      where: { id },
+      data: {
+        ...(updateCategoryDto.name !== undefined && {
+          name: updateCategoryDto.name.trim(),
+        }),
+      },
+    });
   }
 
   async removeCategory(id: string) {
-    try {
-      return await this.prisma.category.delete({
-        where: { id },
-      });
-    } catch (error) {
-      this.handlePrismaError(error);
-    }
-  }
-
-  private handlePrismaError(error: unknown): never {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') {
-        throw new ConflictException('Category name already exists');
-      }
-
-      if (error.code === 'P2025') {
-        throw new NotFoundException('Category not found');
-      }
-    }
-
-    throw error;
+    return await this.prisma.category.delete({
+      where: { id },
+    });
   }
 }

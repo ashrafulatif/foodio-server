@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { MenuItemService } from './menu-item.service';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
@@ -18,6 +20,8 @@ import { JwtAuthGuard } from 'src/common/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/auth/guards/roles.guard';
 import { Roles } from 'src/common/auth/decorators/roles.decorator';
 import { UserRole } from 'generated/prisma/enums';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/config/multer.config';
 
 @Controller('menu-item')
 export class MenuItemController {
@@ -25,9 +29,19 @@ export class MenuItemController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   @Post()
-  async createMenuItem(@Body() payload: CreateMenuItemDto) {
-    const result = await this.menuItemService.createMenuItem(payload);
+  async createMenuItem(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() payload: CreateMenuItemDto,
+  ) {
+    //add cloudinary the url
+    const finalPayload = {
+      ...payload,
+      imageUrl: file?.path,
+    };
+
+    const result = await this.menuItemService.createMenuItem(finalPayload);
     return sendResponse({
       statusCode: status.CREATED,
       success: true,

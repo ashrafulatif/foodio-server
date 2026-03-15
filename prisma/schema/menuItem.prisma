@@ -12,6 +12,7 @@ model MenuItem {
 
   orderItems  OrderItem[] 
 
+  @@unique([name, categoryId])
   @@index([name, price])
   @@index([categoryId])
   @@map("menu_items")

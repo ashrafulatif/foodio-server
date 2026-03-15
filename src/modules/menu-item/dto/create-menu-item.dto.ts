@@ -40,6 +40,7 @@ export class CreateMenuItemDto {
 
   @IsOptional()
   @IsBoolean({ message: 'Available must be a boolean value' })
+  @Type(() => Boolean)
   available?: boolean;
 
   @IsString({ message: 'Category ID must be a string' })

@@ -12,6 +12,10 @@ export class RegisterDto {
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   password: string;
 
+  @IsString()
+  @MinLength(4, { message: 'Address must be at least 4 characters long' })
+  address: string;
+
   @IsOptional()
   @IsString()
   @MinLength(11, { message: 'Phone must be at least 11 characters long' })

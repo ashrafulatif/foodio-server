@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -114,7 +113,7 @@ export class OrdersService {
         page,
         limit,
         total,
-        totalPage: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limit),
       },
       data: orders,
     };
@@ -167,41 +166,24 @@ export class OrdersService {
       throw new BadRequestException('status is required');
     }
 
-    try {
-      return await this.prisma.order.update({
-        where: {
-          id,
-        },
-        data: {
-          status,
-        },
-        include: {
-          items: true,
-        },
-      });
-    } catch (error) {
-      this.handlePrismaError(error);
-    }
+    return await this.prisma.order.update({
+      where: {
+        id,
+      },
+      data: {
+        status,
+      },
+      include: {
+        items: true,
+      },
+    });
   }
 
   async removeOrder(id: string) {
-    try {
-      return await this.prisma.order.delete({
-        where: {
-          id,
-        },
-      });
-    } catch (error) {
-      this.handlePrismaError(error);
-    }
-  }
-
-  private handlePrismaError(error: unknown): never {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException('Order not found');
-      }
-    }
-    throw error;
+    return await this.prisma.order.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

@@ -15,7 +15,9 @@ export class AuthService {
 
   async register(payload: RegisterDto) {
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: payload.email },
+      where: {
+        email: payload.email,
+      },
     });
 
     //check if user already exists
@@ -28,8 +30,7 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        name: payload.name,
-        email: payload.email,
+        ...payload,
         password: hashedPassword,
       },
     });
@@ -59,7 +60,7 @@ export class AuthService {
 
     //create jwt token
     const accessToken = this.jwtService.sign(tokenPayload, {
-      expiresIn: '15m',
+      expiresIn: '1d',
     });
 
     //exlude pass from response

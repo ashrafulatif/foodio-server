@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import paginationAndSortHelper from 'src/common/utils/paginationAndSorting';
@@ -18,6 +17,20 @@ export class MenuItemService {
     const { name, description, price, imageUrl, available, categoryId } =
       payload;
 
+    //check item with same name exist or not in same category
+    const existing = await this.prisma.menuItem.findFirst({
+      where: {
+        name: payload.name,
+        categoryId: payload.categoryId,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(
+        'Menu item with this name already exists in this category',
+      );
+    }
+
     //find category to check if it exists
     const category = await this.prisma.category.findUnique({
       where: { id: payload.categoryId },
@@ -27,24 +40,20 @@ export class MenuItemService {
       throw new NotFoundException('Category not found');
     }
 
-    try {
-      const result = await this.prisma.menuItem.create({
-        data: {
-          name,
-          description,
-          price,
-          imageUrl,
-          available,
-          categoryId,
-        },
-        include: {
-          category: true,
-        },
-      });
-      return result;
-    } catch (error) {
-      this.handlePrismaError(error);
-    }
+    const result = await this.prisma.menuItem.create({
+      data: {
+        name,
+        description,
+        price,
+        imageUrl,
+        available,
+        categoryId,
+      },
+      include: {
+        category: true,
+      },
+    });
+    return result;
   }
 
   async findAllMenuItems(query: any) {
@@ -142,61 +151,37 @@ export class MenuItemService {
       }
     }
 
-    try {
-      return await this.prisma.menuItem.update({
-        where: { id },
-        data: {
-          ...(updateMenuItemDto.name !== undefined && {
-            name: updateMenuItemDto.name.trim(),
-          }),
-          ...(updateMenuItemDto.description !== undefined && {
-            description: updateMenuItemDto.description?.trim(),
-          }),
-          ...(updateMenuItemDto.price !== undefined && {
-            price: updateMenuItemDto.price,
-          }),
-          ...(updateMenuItemDto.imageUrl !== undefined && {
-            imageUrl: updateMenuItemDto.imageUrl,
-          }),
-          ...(updateMenuItemDto.available !== undefined && {
-            available: updateMenuItemDto.available,
-          }),
-          ...(updateMenuItemDto.categoryId !== undefined && {
-            categoryId: updateMenuItemDto.categoryId,
-          }),
-        },
-        include: {
-          category: true,
-        },
-      });
-    } catch (error) {
-      this.handlePrismaError(error);
-    }
+    return await this.prisma.menuItem.update({
+      where: { id },
+      data: {
+        ...(updateMenuItemDto.name !== undefined && {
+          name: updateMenuItemDto.name.trim(),
+        }),
+        ...(updateMenuItemDto.description !== undefined && {
+          description: updateMenuItemDto.description?.trim(),
+        }),
+        ...(updateMenuItemDto.price !== undefined && {
+          price: updateMenuItemDto.price,
+        }),
+        ...(updateMenuItemDto.imageUrl !== undefined && {
+          imageUrl: updateMenuItemDto.imageUrl,
+        }),
+        ...(updateMenuItemDto.available !== undefined && {
+          available: updateMenuItemDto.available,
+        }),
+        ...(updateMenuItemDto.categoryId !== undefined && {
+          categoryId: updateMenuItemDto.categoryId,
+        }),
+      },
+      include: {
+        category: true,
+      },
+    });
   }
 
   async removeMenuItem(id: string) {
-    try {
-      return await this.prisma.menuItem.delete({
-        where: { id },
-      });
-    } catch (error) {
-      this.handlePrismaError(error);
-    }
-  }
-
-  private handlePrismaError(error: unknown): never {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException('Menu item not found');
-      }
-
-      if (error.code === 'P2002') {
-        throw new ConflictException(
-          'Duplicate value violates unique constraint',
-        );
-      }
-    }
-
-    throw error;
+    return await this.prisma.menuItem.delete({
+      where: { id },
+    });
   }
 }

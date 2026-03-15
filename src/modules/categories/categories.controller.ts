@@ -48,7 +48,8 @@ export class CategoriesController {
       statusCode: status.OK,
       success: true,
       message: 'Categories fetched successfully',
-      data: result,
+      data: result.data,
+      meta: result.meta,
     });
   }
 
