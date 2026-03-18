@@ -15,24 +15,77 @@ It provides authentication, role-based access control, category & menu managemen
 - **Validation**: class-validator / class-transformer (Nest ValidationPipe)
 - **File Uploads**: Multer + Cloudinary (multer-storage-cloudinary)
 - **Package manager**: pnpm
-- **Testing**: Jest
+
+
+---
+
+## Quick Start
+
+### 1. Clone & install
+
+```bash
+git clone https://github.com/ashrafulatif/foodio-server
+cd foodio-server
+pnpm install
+```
+
+### 2. Set up environment
+
+```bash
+cp .env.example .env
+# Fill in your DATABASE_URL and other vars
+```
+
+### 3. Generate Prisma client
+
+```bash
+pnpm run generate
+```
+
+### 4. Run migrations
+
+```bash
+pnpm run migrate
+```
+
+### 5. Seed database
+
+```bash
+pnpm run seed
+```
+
+### 6. Start the server
+
+```bash
+pnpm run start:dev
+```
+
+## Default Credentials
+
+| Role     | Email           | Password |
+| -------- | --------------- | -------- |
+| Admin    | lupin@gmail.com | 12345678 |
+| Customer | lily@gmail.com  | 12345678 |
 
 ---
 
 ## Features
 
 ### Authentication & Authorization
+
 - Register / Login / Logout endpoints
 - JWT access token is set as an **httpOnly cookie** (`accessToken`)
 - **Role-based access** using guards + `@Roles(...)` decorator
   - Roles: `ADMIN`, `CUSTOMER`
 
 ### Categories
+
 - Admin can create/update/delete categories
 - Public can list & view categories
 - Pagination supported for list endpoint
 
 ### Menu Items
+
 - Admin can create/update/delete menu items
 - Supports filtering/searching by:
   - search term (`name`, `description`)
@@ -41,6 +94,7 @@ It provides authentication, role-based access control, category & menu managemen
 - Image upload supported (stored in **Cloudinary**)
 
 ### Orders
+
 - Customers can create orders and view their own orders
 - Admin can list all orders, view any order by id, update order status, and delete orders
 - Pagination supported for admin list endpoint
@@ -59,8 +113,8 @@ It provides authentication, role-based access control, category & menu managemen
   - `categories`
   - `menu-item`
   - `orders`
-  - `users` (wired in `AppModule`; implementation may be incomplete depending on current branch/files)
-- `prisma/` — Prisma schema pieces + migrations
+  - `users`
+- `prisma/` — Prisma schema + migrations + seed
 
 ---
 
@@ -81,59 +135,63 @@ So if the server runs on `http://localhost:3000`, endpoints look like:
 Base prefix: `/api/v1`
 
 ### Auth (`/api/v1/auth`)
-| Method | Route | Auth required | Roles | Notes |
-|---|---|---:|---|---|
-| POST | `/auth/register` | No | Public | Creates a user (default role is `CUSTOMER`) |
-| POST | `/auth/login` | No | Public | Sets `accessToken` cookie (httpOnly) |
-| POST | `/auth/logout` | No | Public | Clears `accessToken` cookie |
+
+| Method | Route            | Auth required | Roles  | Notes                                       |
+| ------ | ---------------- | ------------: | ------ | ------------------------------------------- |
+| POST   | `/auth/register` |            No | Public | Creates a user (default role is `CUSTOMER`) |
+| POST   | `/auth/login`    |            No | Public | Sets `accessToken` cookie (httpOnly)        |
+| POST   | `/auth/logout`   |            No | Public | Clears `accessToken` cookie                 |
 
 ### Categories (`/api/v1/categories`)
-| Method | Route | Auth required | Roles |
-|---|---|---:|---|
-| POST | `/categories` | Yes | `ADMIN` |
-| GET | `/categories` | No | Public |
-| GET | `/categories/:id` | No | Public |
-| PATCH | `/categories/:id` | Yes | `ADMIN` |
-| DELETE | `/categories/:id` | Yes | `ADMIN` |
+
+| Method | Route             | Auth required | Roles   |
+| ------ | ----------------- | ------------: | ------- |
+| POST   | `/categories`     |           Yes | `ADMIN` |
+| GET    | `/categories`     |            No | Public  |
+| GET    | `/categories/:id` |            No | Public  |
+| PATCH  | `/categories/:id` |           Yes | `ADMIN` |
+| DELETE | `/categories/:id` |           Yes | `ADMIN` |
 
 ### Menu Items (`/api/v1/menu-item`)
-| Method | Route | Auth required | Roles | Notes |
-|---|---|---:|---|---|
-| POST | `/menu-item` | Yes | `ADMIN` | multipart/form-data, file field name: `file` |
-| GET | `/menu-item` | No | Public | List / search / filter + pagination |
-| GET | `/menu-item/:id` | No | Public | |
-| PATCH | `/menu-item/:id` | Yes | `ADMIN` | |
-| DELETE | `/menu-item/:id` | Yes | `ADMIN` | |
+
+| Method | Route            | Auth required | Roles   | Notes                                        |
+| ------ | ---------------- | ------------: | ------- | -------------------------------------------- |
+| POST   | `/menu-item`     |           Yes | `ADMIN` | multipart/form-data, file field name: `file` |
+| GET    | `/menu-item`     |            No | Public  | List / search / filter + pagination          |
+| GET    | `/menu-item/:id` |            No | Public  |                                              |
+| PATCH  | `/menu-item/:id` |           Yes | `ADMIN` |                                              |
+| DELETE | `/menu-item/:id` |           Yes | `ADMIN` |                                              |
 
 ### Orders (`/api/v1/orders`)
+
 All `/orders` routes require auth (controller-level JWT guard).
 
-| Method | Route | Auth required | Roles |
-|---|---|---:|---|
-| POST | `/orders` | Yes | `ADMIN`, `CUSTOMER` |
-| GET | `/orders` | Yes | `ADMIN` |
-| GET | `/orders/my-orders` | Yes | `CUSTOMER` |
-| GET | `/orders/:id` | Yes | `ADMIN` |
-| PATCH | `/orders/status/:id` | Yes | `ADMIN` |
-| DELETE | `/orders/:id` | Yes | `ADMIN` |
+| Method | Route                | Auth required | Roles               |
+| ------ | -------------------- | ------------: | ------------------- |
+| POST   | `/orders`            |           Yes | `ADMIN`, `CUSTOMER` |
+| GET    | `/orders`            |           Yes | `ADMIN`             |
+| GET    | `/orders/my-orders`  |           Yes | `CUSTOMER`          |
+| GET    | `/orders/:id`        |           Yes | `ADMIN`             |
+| PATCH  | `/orders/status/:id` |           Yes | `ADMIN`             |
+| DELETE | `/orders/:id`        |           Yes | `ADMIN`             |
 
 ---
 
-## Getting Started
+## Getting Started (Detailed)
 
-### 1) Prerequisites
+### Prerequisites
+
 - Node.js installed
 - pnpm installed
 - PostgreSQL running and reachable
 
-### 2) Install dependencies
+### Install dependencies
+
 ```bash
 pnpm install
 ```
 
-### 3) Create a `.env` file
-
-This project requires the following environment variables (see `src/config/env.ts`):
+### Create a `.env` file
 
 ```env
 NODE_ENV=development
@@ -144,29 +202,37 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB_NAME?schema=public"
 JWT_SECRET="your_jwt_secret"
 ACCESS_TOKEN_EXPIRES_IN="15m"
 
-FRONTEND_URL="http://localhost:5173"
+FRONTEND_URL="http://localhost:3000"
 
 CLOUDINARY_CLOUD_NAME="xxxx"
 CLOUDINARY_API_KEY="xxxx"
 CLOUDINARY_API_SECRET="xxxx"
-```
 
-Notes:
-- `FRONTEND_URL` is used for CORS and must match your frontend origin.
-- JWT is read from cookies (`accessToken`), so clients must send credentials (cookies) with requests.
+ADMIN_EMAIL="admin@foodio.com"
+ADMIN_PASSWORD="Admin@123"
+ADMIN_NAME="Super Admin"
+```
 
 ---
 
 ## Database & Prisma
 
 ### Generate Prisma client
+
 ```bash
 pnpm run generate
 ```
 
-### Run migrations (development)
+### Run migrations
+
 ```bash
 pnpm run migrate
+```
+
+### Seed database
+
+```bash
+pnpm run seed:db
 ```
 
 ---
@@ -174,11 +240,13 @@ pnpm run migrate
 ## Running the Server
 
 ### Development
+
 ```bash
 pnpm run start:dev
 ```
 
 ### Production build & run
+
 ```bash
 pnpm run build
 pnpm run start:prod
@@ -198,6 +266,8 @@ From `package.json`:
 - `pnpm run test` / `test:e2e` / `test:cov` — Jest tests
 - `pnpm run migrate` — `prisma migrate dev`
 - `pnpm run generate` — `prisma generate`
+- `pnpm run seed:db` — seed database with sample data
+- `pnpm run seed:admin` — seed admin with data in env
 
 ---
 
@@ -234,6 +304,7 @@ Controllers return a consistent structure via `sendResponse(...)`:
 ## Error Handling
 
 A global Prisma exception filter is applied:
+
 - Prisma `P2002` → `409 Conflict` (duplicate unique constraint)
 - Prisma `P2025` → `404 Not Found` (record not found)
 - otherwise → `500` database error
@@ -243,6 +314,7 @@ A global Prisma exception filter is applied:
 ## Data Model (Prisma)
 
 Key entities:
+
 - `User` (role: `ADMIN` / `CUSTOMER`)
 - `Category`
 - `MenuItem` (belongs to Category, can be marked `available`)
@@ -250,20 +322,9 @@ Key entities:
 - `OrderItem` (join between Order and MenuItem)
 
 Enums:
+
 - `UserRole`: `CUSTOMER`, `ADMIN`
 - `OrderStatus`: `PENDING`, `PREPARING`, `READY`, `COMPLETED`
 - `PaymentMethod`: `CASH`, `CARD`, `ONLINE`
 
 ---
-
-## Deployment Notes
-
-- Ensure all required env vars exist in the deployment environment.
-- Run migrations during deployment (or CI/CD step) as appropriate.
-- Configure reverse proxy (if any) to forward cookies correctly and allow CORS credentials for your frontend domain.
-
----
-
-## License
-
-Currently marked as **UNLICENSED** in `package.json`. Update this if you plan to open-source the project.

@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
-    "seed": "pnpm exec ts-node -r tsconfig-paths/register src/scripts/seedAdmin.ts"
+    "seed:admin": "pnpm exec ts-node -r tsconfig-paths/register src/scripts/seedAdmin.ts",
+    "seed:db": "pnpm exec ts-node -r tsconfig-paths/register src/scripts/dbSeed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
