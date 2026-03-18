@@ -15,7 +15,7 @@ It provides authentication, role-based access control, category & menu managemen
 - **Validation**: class-validator / class-transformer (Nest ValidationPipe)
 - **File Uploads**: Multer + Cloudinary (multer-storage-cloudinary)
 - **Package manager**: pnpm
-
+- **Deployment**: Render
 
 ---
 
