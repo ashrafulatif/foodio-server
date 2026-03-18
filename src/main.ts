@@ -31,6 +31,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new PrismaExceptionFilter());
 
-  await app.listen(Number(envVars.PORT) || 3000);
+  await app.listen(envVars.PORT || 3000);
 }
 bootstrap();
